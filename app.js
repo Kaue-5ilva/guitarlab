@@ -28,8 +28,8 @@ function drawChord(key){
  const c=chords[key];if(!c)return;$("#chordTitle").textContent=key;$("#chordSubtitle").textContent=c.name;$("#chordDescription").textContent=c.desc;
  const x0=36,y0=34,dx=43,dy=34;let svg='<svg viewBox="0 0 300 238" role="img" aria-label="Diagrama do acorde '+key+', seis cordas; Mi, Lá, Ré, Sol, Si, Mi da esquerda para a direita">';
  for(let s=0;s<6;s++){const x=x0+s*dx,f=c.f[s];svg+='<line x1="'+x+'" y1="'+y0+'" x2="'+x+'" y2="'+(y0+4*dy)+'" stroke="#c7cebd" stroke-width="'+((s===0||s===5)?2:1.3)+'"/>';
- if(f<=0)svg+='<text x="'+x+'" y="21" fill="#c9f36a" font-size="17" text-anchor="middle">'+(f===0?"○":"×")+'</text>';
- else{const y=y0+(f-.5)*dy;svg+='<circle cx="'+x+'" cy="'+y+'" r="10" fill="#c9f36a"/><text x="'+x+'" y="'+(y+3.5)+'" text-anchor="middle" fill="#182012" font-size="10" font-weight="700">'+c.d[s]+'</text>';}}
+ if(f<=0)svg+='<text x="'+x+'" y="21" fill="#4da3ff" font-size="17" text-anchor="middle">'+(f===0?"○":"×")+'</text>';
+ else{const y=y0+(f-.5)*dy;svg+='<circle cx="'+x+'" cy="'+y+'" r="10" fill="#4da3ff"/><text x="'+x+'" y="'+(y+3.5)+'" text-anchor="middle" fill="#080c14" font-size="10" font-weight="700">'+c.d[s]+'</text>';}}
  for(let f=0;f<=4;f++){const y=y0+f*dy;svg+='<line x1="'+x0+'" y1="'+y+'" x2="'+(x0+5*dx)+'" y2="'+y+'" stroke="'+(f===0?"#eef2e4":"#596451")+'" stroke-width="'+(f===0?4:1.2)+'"/>';}
  const stringNames=["E","A","D","G","B","E"];
  for(let s=0;s<6;s++){const x=x0+s*dx;svg+='<text x="'+x+'" y="189" text-anchor="middle" fill="#8ec5ff" font-size="11" font-weight="700">'+stringNames[s]+'</text><text x="'+x+'" y="203" text-anchor="middle" fill="#91a4bc" font-size="8">'+(6-s)+'</text>';}
