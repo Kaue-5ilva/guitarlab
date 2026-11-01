@@ -3,6 +3,9 @@ name: Publicar GuitarLab no GitHub Pages
 on:
   push:
     branches: [main]
+    paths:
+      - "GuitarLab-Fase-4.zip"
+      - ".github/workflows/deploy.yml"
   workflow_dispatch:
 
 permissions:
@@ -26,7 +29,7 @@ jobs:
         run: |
           rm -rf _site guitarlab-extraido
           mkdir -p _site guitarlab-extraido
-          unzip -q guitarlab-site.zip -d guitarlab-extraido
+          unzip -q GuitarLab-Fase-4.zip -d guitarlab-extraido
           cp -R guitarlab-extraido/guitarlab/. _site/
           touch _site/.nojekyll
       - name: Enviar artefato
