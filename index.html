@@ -1,1 +1,51 @@
-/mnt/data/GuitarLab-Fase-4.zip
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101114">
+  <meta name="color-scheme" content="dark">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="icon" type="image/png" href="icons/icon-192.png">
+  <meta name="description" content="GuitarLab — aprenda, pratique e evolua na guitarra.">
+  <title>GuitarLab — Escola de Guitarra</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#content">Pular para o conteúdo</a>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="#" data-view="inicio"><span class="brand-mark">G</span><span>Guitar<span class="accent">Lab</span><small>ESCOLA & LABORATÓRIO</small></span></a>
+      <div class="side-label">MENU PRINCIPAL</div>
+      <nav class="nav">
+        <button class="nav-item active" data-view="inicio"><span>⌂</span> Visão geral</button>
+        <button class="nav-item" data-view="afinador"><span>◉</span> Afinador</button>
+        <button class="nav-item" data-view="curso"><span>▤</span> Curso de guitarra</button>
+        <button class="nav-item" data-view="acordes"><span>♬</span> Acordes</button>
+        <button class="nav-item" data-view="braco"><span>▥</span> Braço interativo</button>
+        <button class="nav-item" data-view="tablaturas"><span>♫</span> Editor de tablaturas</button>
+        <button class="nav-item" data-view="timbres"><span>🎛</span> Laboratório de timbres</button>
+        <button class="nav-item" data-view="metronomo"><span>◷</span> Metrônomo</button>
+        <button class="nav-item" data-view="treino"><span>⚡</span> Treinamento</button>
+      </nav>
+      <div class="sidebar-bottom"><div class="mini-avatar">♪</div><div><strong>Meu espaço</strong><small>Progresso salvo neste dispositivo</small></div></div>
+    </aside>
+    <main class="main" id="mainContent">
+      <header class="topbar">
+        <button class="mobile-menu" id="menuBtn" aria-label="Abrir menu" aria-controls="sidebar" aria-expanded="false">☰</button>
+        <div><span class="eyebrow">ESCOLA DIGITAL DE GUITARRA</span><h1 id="pageTitle">Visão geral</h1></div>
+        <div class="top-actions"><span class="status-dot" id="connectionDot" aria-hidden="true"></span><span class="status-text" id="connectionText">Aplicação pronta</span><button class="btn secondary install-btn" id="installBtn" type="button" hidden>Instalar app</button></div>
+      </header>
+      <div id="content" class="content"></div>
+      <footer>GuitarLab <span>•</span> Aprenda no seu ritmo. Pratique todos os dias.</footer>
+    </main>
+  </div>
+  <div id="toast" class="toast" role="status"></div>
+  <script src="timbres.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
