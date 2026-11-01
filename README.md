@@ -32,3 +32,6 @@ HTML5, CSS3 e JavaScript moderno, sem frameworks. O site não possui backend e n
 Abra index.html em um navegador para usar a biblioteca de acordes e o metrônomo. Para testar o afinador, use localhost ou HTTPS, pois navegadores restringem o microfone em páginas file://.
 
 Projeto pessoal. Consulte o proprietário do repositório antes de reutilizar marca e conteúdo.
+
+
+Implantação contínua ativa: os pushes para main acionam a publicação no GitHub Pages.
