@@ -6,7 +6,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%234da3ff'/%3E%3Ctext x='14' y='46' font-size='43' fill='%23080c14'%3E♪%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./styles.css?v=practice-20261102"><script src="./app.js?v=practice-20261102b" defer></script></head>
+<link rel="stylesheet" href="./styles.css?v=practice-20261102"><script src="./app.js?v=yousician-flow-20261102" defer></script></head>
 <body>
 <div class="topline"><i></i> GUITARRA ELÉTRICA E VIOLÃO · 6 CORDAS <b>•</b> 100% ONLINE</div>
 <header class="header"><a class="logo" href="#inicio"><span class="logo-icon">♪</span><span>GUITAR<span>LAB</span><small>PLAY. LEARN. REPEAT.</small></span></a>
@@ -36,6 +36,17 @@
 <article class="path-card"><div class="path-top"><span>03</span><b>EVOLUÇÃO</b></div><div class="path-art purple">✳</div><small>NÍVEL 03 · INTERMEDIÁRIO</small><h3>Escalas e sonoridade</h3><p>Estude notas no braço, escala maior, pentatônica, riffs, dedilhados e expressão musical.</p><a href="#rotina">Ver conteúdo <b>↗</b></a></article></div></section>
 <section class="section wrap practice-section" id="aulas">
 <div class="section-head"><div><p class="eyebrow">03 / TREINE COM SEU INSTRUMENTO</p><h2>Aulas práticas.<br><em>Som de verdade.</em></h2></div><p>Toque sua guitarra elétrica ou seu violão perto do microfone. O GuitarLab escuta as notas, compara com o exercício e mostra quando você acertar.</p></div>
+<div class="practice-dashboard">
+<div class="practice-player"><div class="player-avatar">♪</div><div><small>SEU PROGRESSO</small><strong id="playerLevel">Nível 1 · Iniciante</strong><span id="playerXpText">0 / 100 XP para o próximo nível</span></div></div>
+<div class="xp-track"><i id="playerXpBar"></i></div>
+<div class="practice-stats"><div><strong id="completedLessons">0/3</strong><span>LIÇÕES CONCLUÍDAS</span></div><div><strong id="totalXp">0 XP</strong><span>EXPERIÊNCIA TOTAL</span></div><div><strong id="practiceAccuracy">—</strong><span>PRECISÃO DA ÚLTIMA AULA</span></div></div>
+</div>
+<div class="practice-path-label"><span>SEU CAMINHO DE APRENDIZADO</span><small>COMPLETE AS ETAPAS NO SEU RITMO</small></div>
+<div class="practice-path" id="practicePath">
+<button class="path-card active" data-lesson="open"><span class="path-number">01</span><span class="path-copy"><b>Primeiras notas</b><small>Conheça as seis cordas</small></span><span class="path-status" id="pathStatus-open">INICIAR →</span></button>
+<button class="path-card" data-lesson="chromatic"><span class="path-number">02</span><span class="path-copy"><b>Coordenação</b><small>Cromatismo na primeira corda</small></span><span class="path-status" id="pathStatus-chromatic">BLOQUEIO REMOVIDO</span></button>
+<button class="path-card" data-lesson="melody"><span class="path-number">03</span><span class="path-copy"><b>Sua primeira melodia</b><small>Conecte notas em sequência</small></span><span class="path-status" id="pathStatus-melody">BLOQUEIO REMOVIDO</span></button>
+</div>
 <div class="practice-shell">
 <div class="practice-main">
 <div class="practice-selector"><label for="practiceSelect">ESCOLHA UMA LIÇÃO</label><select id="practiceSelect"><option value="open">01 · Cordas soltas</option><option value="chromatic">02 · Cromatismo na primeira corda</option><option value="melody">03 · Pequena sequência melódica</option></select></div>

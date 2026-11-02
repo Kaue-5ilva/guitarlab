@@ -42,3 +42,21 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{ou
 .practice-disclaimer{margin:14px 0 0;color:#91a4bc;font-size:9px;line-height:1.75}
 @media(max-width:800px){.practice-shell{grid-template-columns:1fr}.practice-monitor{display:grid;grid-template-columns:1fr 1fr;column-gap:18px}.practice-monitor-top,.practice-progress,.practice-feedback,.practice-disclaimer{grid-column:1/-1}.practice-note-block strong{font-size:46px}}
 @media(max-width:620px){.practice-section{padding-top:72px;padding-bottom:75px}.practice-main,.practice-monitor{padding:18px 14px}.practice-lesson-head h3{font-size:22px}.practice-actions .button{width:100%}.practice-monitor{display:flex}.practice-note-block strong{font-size:50px}}
+
+/* Trilha gamificada de aprendizagem — referência em apps musicais */
+.practice-dashboard{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:center;padding:18px 20px;margin:0 0 28px;background:linear-gradient(110deg,#14243a,#101827);border:1px solid #29415f;border-radius:8px}
+.practice-player{display:flex;align-items:center;gap:12px}.player-avatar{width:42px;height:42px;display:grid;place-items:center;border-radius:50%;background:#4da3ff;color:#080c14;font-size:23px}
+.practice-player>div:last-child{display:flex;flex-direction:column;gap:3px}.practice-player small,.practice-player span{font:8px var(--mono);letter-spacing:.08em;color:#91a4bc}.practice-player strong{font:600 15px var(--display);color:#f4f7fc}
+.xp-track{height:9px;border-radius:20px;background:#26364b;overflow:hidden}.xp-track i{display:block;width:0;height:100%;border-radius:20px;background:linear-gradient(90deg,#4da3ff,#b4d4ff);transition:width .3s}
+.practice-stats{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid #ffffff14;padding-top:14px}
+.practice-stats>div{display:flex;flex-direction:column;gap:4px}.practice-stats strong{font:600 19px var(--display);color:#f4f7fc}.practice-stats span{font:7px var(--mono);letter-spacing:.08em;color:#91a4bc}
+.practice-path-label{display:flex;justify-content:space-between;gap:10px;align-items:center;margin:0 0 10px}.practice-path-label span{font:9px var(--mono);letter-spacing:.12em;color:#d2dceb}.practice-path-label small{font:8px var(--mono);color:#91a4bc}
+.practice-path{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+.path-card{display:flex;align-items:center;gap:10px;min-width:0;padding:13px 12px;background:#0e1522;border:1px solid #26364b;border-radius:6px;color:#f4f7fc;text-align:left;cursor:pointer;transition:border-color .2s,background .2s}
+.path-card:hover,.path-card.active{border-color:#4da3ff;background:#14243a}.path-card.completed{border-color:#31577e}
+.path-number{flex:0 0 32px;width:32px;height:32px;display:grid;place-items:center;border-radius:50%;background:#1b2b42;color:#8ec5ff;font:11px var(--mono)}
+.path-card.completed .path-number{background:#4da3ff;color:#080c14}
+.path-copy{display:flex;flex:1;min-width:0;flex-direction:column;gap:4px}.path-copy b{font:600 11px var(--display)}.path-copy small{font-size:9px;color:#91a4bc;line-height:1.35}
+.path-status{font:7px var(--mono);color:#8ec5ff;white-space:nowrap}
+@media(max-width:800px){.practice-path{grid-template-columns:1fr}.practice-dashboard{grid-template-columns:1fr}.xp-track{grid-row:2}.practice-stats{grid-row:3}}
+@media(max-width:480px){.practice-path-label{align-items:flex-start;flex-direction:column}.practice-stats span{font-size:6px}.practice-stats strong{font-size:16px}.path-card{padding:11px}.path-status{font-size:6px}}

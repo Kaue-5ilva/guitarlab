@@ -68,7 +68,19 @@ const practiceLessons={
  chromatic:{label:"LIÇÃO 02 · COORDENAÇÃO",title:"Cromatismo na primeira corda",goal:"Na 1ª corda (Mi agudo), toque as casas 0, 1, 2 e 3 em sequência, usando um dedo por casa.",instruction:"Comece com a corda solta e avance uma casa por vez: 0, 1, 2 e 3. Pressione perto do traste e toque uma nota de cada vez.",targets:[{midi:64,label:"E4",detail:"1ª corda · casa 0 · solta"},{midi:65,label:"F4",detail:"1ª corda · casa 1"},{midi:66,label:"F♯4",detail:"1ª corda · casa 2"},{midi:67,label:"G4",detail:"1ª corda · casa 3"}]},
  melody:{label:"LIÇÃO 03 · PRIMEIRA MELODIA",title:"Uma pequena sequência melódica",goal:"Toque a sequência G4 – A4 – B4 – A4 – G4 – E4 na primeira corda.",instruction:"Na 1ª corda, toque as casas 3, 5, 7, 5, 3 e 0. Mantenha o tempo regular e abafe levemente cada nota antes da próxima.",targets:[{midi:67,label:"G4",detail:"1ª corda · casa 3"},{midi:69,label:"A4",detail:"1ª corda · casa 5"},{midi:71,label:"B4",detail:"1ª corda · casa 7"},{midi:69,label:"A4",detail:"1ª corda · casa 5"},{midi:67,label:"G4",detail:"1ª corda · casa 3"},{midi:64,label:"E4",detail:"1ª corda · casa 0 · solta"}]}
 };
-let selectedPractice="open",practiceIndex=0,practiceStream=null,practiceContext=null,practiceAnalyser=null,practiceFrame=null,practiceArmed=true,practiceStableMidi=null,practiceStableFrames=0,practiceSilenceFrames=0;
+let selectedPractice="open",practiceIndex=0,practiceStream=null,practiceContext=null,practiceAnalyser=null,practiceFrame=null,practiceArmed=true,practiceStableMidi=null,practiceStableFrames=0,practiceSilenceFrames=0,practiceCorrect=0;
+const progressKey="guitarlab-learning-progress-v1";
+function loadLearningProgress(){try{return JSON.parse(localStorage.getItem(progressKey))||{xp:0,completed:[],lastAccuracy:null};}catch(e){return{xp:0,completed:[],lastAccuracy:null};}}
+let learningProgress=loadLearningProgress();
+function saveLearningProgress(){try{localStorage.setItem(progressKey,JSON.stringify(learningProgress));}catch(e){}}
+function renderLearningProgress(){
+ const xp=learningProgress.xp||0,level=Math.floor(xp/100)+1,within=xp%100;
+ $("#playerLevel").textContent="Nível "+level+" · "+(level===1?"Iniciante":level<4?"Praticante":"Músico em evolução");
+ $("#playerXpText").textContent=within+" / 100 XP para o próximo nível";$("#playerXpBar").style.width=within+"%";
+ $("#totalXp").textContent=xp+" XP";$("#completedLessons").textContent=learningProgress.completed.length+"/3";
+ $("#practiceAccuracy").textContent=learningProgress.lastAccuracy===null?"—":learningProgress.lastAccuracy+"%";
+ Object.keys(practiceLessons).forEach((key,index)=>{const done=learningProgress.completed.includes(key),card=document.querySelector('[data-lesson="'+key+'"]');if(card){card.classList.toggle("completed",done);card.classList.toggle("active",key===selectedPractice);$("#pathStatus-"+key).textContent=done?"✓ CONCLUÍDA":index===0?"INICIAR →":"PRATICAR →";}});
+}
 const practiceSelect=$("#practiceSelect"),practiceNotes=["C","C♯","D","D♯","E","F","F♯","G","G♯","A","A♯","B"];
 function renderPractice(){
  const lesson=practiceLessons[selectedPractice],target=lesson.targets[Math.min(practiceIndex,lesson.targets.length-1)];
@@ -76,9 +88,9 @@ function renderPractice(){
  const sequence=$("#practiceSequence");sequence.innerHTML="";
  lesson.targets.forEach((item,index)=>{const chip=document.createElement("span");chip.className="practice-chip"+(index<practiceIndex?" done":index===practiceIndex?" current":"");chip.textContent=(index+1)+". "+item.label;sequence.appendChild(chip);});
  const percent=Math.round(practiceIndex/lesson.targets.length*100);$("#practiceProgressText").textContent=practiceIndex+" de "+lesson.targets.length+" notas";$("#practiceProgressPercent").textContent=percent+"%";$("#practiceProgressBar").style.width=percent+"%";
- $("#practiceState").textContent=practiceStream?"ESCUTANDO":practiceIndex===lesson.targets.length?"CONCLUÍDA":"AGUARDANDO";
+ $("#practiceState").textContent=practiceStream?"ESCUTANDO":practiceIndex===lesson.targets.length?"CONCLUÍDA":"AGUARDANDO";renderLearningProgress();
 }
-function resetPractice(){practiceIndex=0;renderPractice();$("#practiceHeard").textContent="—";$("#practiceFrequency").textContent="Aguardando o primeiro toque";$("#practiceFeedback").textContent="Toque uma nota por vez. O sistema vai comparar a altura musical com a nota solicitada.";}
+function resetPractice(){practiceIndex=0;practiceCorrect=0;renderPractice();$("#practiceHeard").textContent="—";$("#practiceFrequency").textContent="Aguardando o primeiro toque";$("#practiceFeedback").textContent="Toque uma nota por vez. O sistema vai comparar a altura musical com a nota solicitada.";}
 async function stopPractice(updateMessage=true){
  if(practiceFrame)cancelAnimationFrame(practiceFrame);practiceFrame=null;if(practiceStream)practiceStream.getTracks().forEach(track=>track.stop());practiceStream=null;
  if(practiceContext&&practiceContext.state!=="closed")await practiceContext.close();practiceContext=null;practiceAnalyser=null;
@@ -100,7 +112,9 @@ function practiceListen(){
  else{practiceSilenceFrames++;practiceStableFrames=0;practiceStableMidi=null;if(practiceSilenceFrames>=5)practiceArmed=true;}
  if(practiceAnalyser&&practiceContext)practiceFrame=requestAnimationFrame(practiceListen);
 }
-practiceSelect.addEventListener("change",async()=>{await stopPractice(false);selectedPractice=practiceSelect.value;resetPractice();$("#practiceStatus").textContent="Lição selecionada. Ative o microfone quando estiver pronto.";});
+function choosePractice(key){if(!practiceLessons[key])return;selectedPractice=key;practiceSelect.value=key;document.querySelectorAll(".path-card").forEach(card=>card.classList.toggle("active",card.dataset.lesson===key));renderLearningProgress();resetPractice();}
+document.querySelectorAll(".path-card").forEach(card=>card.addEventListener("click",async()=>{await stopPractice(false);choosePractice(card.dataset.lesson);$("#practiceStatus").textContent="Lição selecionada. Prepare o instrumento e comece quando estiver pronto.";}));
+practiceSelect.addEventListener("change",async()=>{await stopPractice(false);selectedPractice=practiceSelect.value;choosePractice(selectedPractice);$("#practiceStatus").textContent="Lição selecionada. Ative o microfone quando estiver pronto.";});
 $("#practiceStart").addEventListener("click",async()=>{
  if(practiceStream)return;if(practiceIndex>=practiceLessons[selectedPractice].targets.length)resetPractice();
  try{if(!navigator.mediaDevices?.getUserMedia)throw Error("O acesso ao microfone exige HTTPS e um navegador compatível.");const Ctx=window.AudioContext||window.webkitAudioContext;if(!Ctx)throw Error("Este navegador não oferece análise de áudio compatível.");
