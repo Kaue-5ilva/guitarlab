@@ -89,7 +89,7 @@ function practiceResult(midi,cents,hz){
  $("#practiceHeard").textContent=heard;$("#practiceFrequency").textContent=hz.toFixed(1)+" Hz · "+(cents>0?"+":"")+cents.toFixed(0)+" cents";
  if(midi===target.midi&&Math.abs(cents)<=45){
   practiceIndex++;renderPractice();$("#practiceFeedback").textContent="Nota correta! Abafe a corda e toque a próxima quando estiver pronto.";
-  if(practiceIndex>=lesson.targets.length){$("#practiceFeedback").textContent="Excelente! Você concluiu esta lição com todas as notas reconhecidas.";$("</>");$("#practiceStatus").textContent="Lição concluída. Escolha outra atividade para continuar praticando.";stopPractice(false);}
+  if(practiceIndex>=lesson.targets.length){$("#practiceFeedback").textContent="Excelente! Você concluiu esta lição com todas as notas reconhecidas.";$("#practiceStatus").textContent="Lição concluída. Escolha outra atividade para continuar praticando.";stopPractice(false);}
   else $("#practiceExpected").textContent=lesson.targets[practiceIndex].label;
  }else if(midi===target.midi)$("#practiceFeedback").textContent="A nota está correta, mas parece desafinada ("+(cents>0?"acima":"abaixo")+" do tom). Afine o instrumento e tente novamente.";
  else $("#practiceFeedback").textContent="Ainda não. O microfone ouviu "+heard+", mas a nota esperada é "+target.label+". Confira a corda e a casa indicadas.";
@@ -98,7 +98,7 @@ function practiceListen(){
  if(!practiceAnalyser||!practiceContext)return;const buffer=new Float32Array(practiceAnalyser.fftSize);practiceAnalyser.getFloatTimeDomainData(buffer);const hz=estimate(buffer,practiceContext.sampleRate);
  if(hz){const midiFloat=69+12*Math.log2(hz/440),midi=Math.round(midiFloat),cents=(midiFloat-midi)*100;practiceSilenceFrames=0;if(practiceStableMidi===midi)practiceStableFrames++;else{practiceStableMidi=midi;practiceStableFrames=1;}if(practiceStableFrames>=3&&practiceArmed){practiceArmed=false;practiceResult(midi,cents,hz);}}
  else{practiceSilenceFrames++;practiceStableFrames=0;practiceStableMidi=null;if(practiceSilenceFrames>=5)practiceArmed=true;}
- practiceFrame=requestAnimationFrame(practiceListen);
+ if(practiceAnalyser&&practiceContext)practiceFrame=requestAnimationFrame(practiceListen);
 }
 practiceSelect.addEventListener("change",async()=>{await stopPractice(false);selectedPractice=practiceSelect.value;resetPractice();$("#practiceStatus").textContent="Lição selecionada. Ative o microfone quando estiver pronto.";});
 $("#practiceStart").addEventListener("click",async()=>{
