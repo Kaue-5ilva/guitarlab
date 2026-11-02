@@ -44,16 +44,77 @@ function schedule(){if(!metroOn)return;while(nextAt<audio.currentTime+.12){const
 function stopMetro(){metroOn=false;clearInterval(metroLoop);metroLoop=null;$("#metroToggle").textContent="▶ INICIAR METRÔNOMO";$("#beat").classList.remove("flash");}
 $("#metroToggle").addEventListener("click",async()=>{if(metroOn){stopMetro();return;}try{const Ctx=window.AudioContext||window.webkitAudioContext;if(!Ctx)throw Error("Áudio não suportado neste navegador.");audio||(audio=new Ctx());await audio.resume();beat=0;nextAt=audio.currentTime+.05;metroOn=true;$("#metroToggle").textContent="Ⅱ PAUSAR METRÔNOMO";schedule();metroLoop=setInterval(schedule,25);}catch(e){$("#metroStatus").textContent=e.message;}});
 let stream=null,micAudio=null,analyser=null,frame=null;const notes=["C","C♯","D","D♯","E","F","F♯","G","G♯","A","A♯","B"];
-function estimate(buffer,rate){let energy=0;for(let i=0;i<buffer.length;i++)energy+=buffer[i]*buffer[i];if(Math.sqrt(energy/buffer.length)<.012)return null;const min=Math.floor(rate/1000),max=Math.min(Math.floor(rate/65),buffer.length-1);let best=-1,bestCorr=0,last=1;
-for(let lag=min;lag<=max;lag++){let corr=0;for(let i=0;i<buffer.length-lag;i++)corr+=buffer[i]*buffer[i+lag];corr/=buffer.length-lag;if(corr>.9&&corr>last){if(corr>bestCorr){bestCorr=corr;best=lag;}}else if(best!==-1)break;last=corr;}return best<0?null:rate/best;}
+function estimate(buffer,rate){
+ const step=4,n=Math.floor(buffer.length/step),sampleRate=rate/step,signal=new Float32Array(n);let mean=0;
+ for(let i=0;i<n;i++){signal[i]=buffer[i*step];mean+=signal[i];}
+ mean/=n;let energy=0;for(let i=0;i<n;i++){signal[i]-=mean;energy+=signal[i]*signal[i];}
+ if(Math.sqrt(energy/n)<.008)return null;
+ const minLag=Math.max(2,Math.floor(sampleRate/1000)),maxLag=Math.min(Math.floor(sampleRate/65),Math.floor(n/3));
+ const correlations=new Float32Array(maxLag+2);let bestLag=-1,bestCorr=0;
+ for(let lag=minLag;lag<=maxLag;lag++){let cross=0,a=0,b=0;for(let i=0;i<n-lag;i++){const x=signal[i],y=signal[i+lag];cross+=x*y;a+=x*x;b+=y*y;}const corr=(a>0&&b>0)?cross/Math.sqrt(a*b):0;correlations[lag]=corr;if(corr>bestCorr){bestCorr=corr;bestLag=lag;}}
+ if(bestLag<0||bestCorr<.55)return null;
+ let chosen=bestLag;for(let lag=minLag+1;lag<bestLag;lag++){const c=correlations[lag];if(c>=bestCorr*.92&&c>.55&&c>=correlations[lag-1]&&c>=correlations[lag+1]){chosen=lag;break;}}
+ const left=correlations[chosen-1]||0,center=correlations[chosen],right=correlations[chosen+1]||0,denom=left-2*center+right,shift=Math.abs(denom)<1e-8?0:.5*(left-right)/denom;
+ return sampleRate/(chosen+Math.max(-.5,Math.min(.5,shift)));
+}
 function listen(){if(!analyser||!micAudio)return;const buf=new Float32Array(analyser.fftSize);analyser.getFloatTimeDomainData(buf);const hz=estimate(buf,micAudio.sampleRate);
 if(hz){const midi=Math.round(69+12*Math.log2(hz/440)),name=notes[(midi%12+12)%12],octave=Math.floor(midi/12)-1,ref=440*Math.pow(2,(midi-69)/12),cents=1200*Math.log2(hz/ref);$("#tunerNote").textContent=name+octave;$("#tunerFrequency").textContent=hz.toFixed(1)+" Hz · "+(cents>0?"+":"")+cents.toFixed(0)+" cents";$("#tunerNeedle").style.transform="rotate("+Math.max(-42,Math.min(42,cents*1.4))+"deg)";$("#tunerStatus").textContent=Math.abs(cents)<5?"Afinada! Nota estável.":cents<0?"Nota baixa — aumente a tensão com cuidado.":"Nota alta — alivie a tensão com cuidado.";}
 else $("#tunerStatus").textContent="Escutando… toque uma corda isolada e deixe a nota soar.";frame=requestAnimationFrame(listen);}
 async function stopTuner(){if(frame)cancelAnimationFrame(frame);frame=null;if(stream)stream.getTracks().forEach(t=>t.stop());stream=null;if(micAudio&&micAudio.state!=="closed")await micAudio.close();micAudio=null;analyser=null;$("#tunerToggle").textContent="⌁ ATIVAR MICROFONE";$("#tunerNote").textContent="—";$("#tunerFrequency").textContent="Aguardando áudio";}
-$("#tunerToggle").addEventListener("click",async()=>{if(stream){await stopTuner();$("#tunerStatus").textContent="Microfone desativado.";return;}try{if(!navigator.mediaDevices?.getUserMedia)throw Error("O microfone exige HTTPS e um navegador compatível.");stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});const Ctx=window.AudioContext||window.webkitAudioContext;micAudio=new Ctx();const source=micAudio.createMediaStreamSource(stream);analyser=micAudio.createAnalyser();analyser.fftSize=4096;source.connect(analyser);$("#tunerToggle").textContent="Ⅱ DESATIVAR MICROFONE";$("#tunerStatus").textContent="Microfone ativo. Toque uma corda por vez.";listen();}catch(e){await stopTuner();$("#tunerStatus").textContent=e.name==="NotAllowedError"?"Permissão negada. Libere o microfone nas configurações do navegador.":e.message;}});
-window.addEventListener("pagehide",()=>{stopMetro();if(stream)stream.getTracks().forEach(t=>t.stop());});
+$("#tunerToggle").addEventListener("click",async()=>{if(stream){await stopTuner();$("#tunerStatus").textContent="Microfone desativado.";return;}try{if(!navigator.mediaDevices?.getUserMedia)throw Error("O microfone exige HTTPS e um navegador compatível.");stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});const Ctx=window.AudioContext||window.webkitAudioContext;micAudio=new Ctx();const source=micAudio.createMediaStreamSource(stream);analyser=micAudio.createAnalyser();analyser.fftSize=8192;source.connect(analyser);$("#tunerToggle").textContent="Ⅱ DESATIVAR MICROFONE";$("#tunerStatus").textContent="Microfone ativo. Toque uma corda por vez.";listen();}catch(e){await stopTuner();$("#tunerStatus").textContent=e.name==="NotAllowedError"?"Permissão negada. Libere o microfone nas configurações do navegador.":e.message;}});
+
+const practiceLessons={
+ open:{label:"LIÇÃO 01 · AFINAÇÃO PADRÃO",title:"Conhecendo as cordas soltas",goal:"Toque as seis cordas sem pressionar nenhuma casa, da mais grave à mais aguda.",instruction:"Toque apenas a corda indicada. Deixe a nota soar por um instante e depois abafe a corda antes de tocar a próxima.",targets:[{midi:40,label:"E2",detail:"6ª corda · Mi grave (solta)"},{midi:45,label:"A2",detail:"5ª corda · Lá (solta)"},{midi:50,label:"D3",detail:"4ª corda · Ré (solta)"},{midi:55,label:"G3",detail:"3ª corda · Sol (solta)"},{midi:59,label:"B3",detail:"2ª corda · Si (solta)"},{midi:64,label:"E4",detail:"1ª corda · Mi agudo (solta)"}]},
+ chromatic:{label:"LIÇÃO 02 · COORDENAÇÃO",title:"Cromatismo na primeira corda",goal:"Na 1ª corda (Mi agudo), toque as casas 0, 1, 2 e 3 em sequência, usando um dedo por casa.",instruction:"Comece com a corda solta e avance uma casa por vez: 0, 1, 2 e 3. Pressione perto do traste e toque uma nota de cada vez.",targets:[{midi:64,label:"E4",detail:"1ª corda · casa 0 · solta"},{midi:65,label:"F4",detail:"1ª corda · casa 1"},{midi:66,label:"F♯4",detail:"1ª corda · casa 2"},{midi:67,label:"G4",detail:"1ª corda · casa 3"}]},
+ melody:{label:"LIÇÃO 03 · PRIMEIRA MELODIA",title:"Uma pequena sequência melódica",goal:"Toque a sequência G4 – A4 – B4 – A4 – G4 – E4 na primeira corda.",instruction:"Na 1ª corda, toque as casas 3, 5, 7, 5, 3 e 0. Mantenha o tempo regular e abafe levemente cada nota antes da próxima.",targets:[{midi:67,label:"G4",detail:"1ª corda · casa 3"},{midi:69,label:"A4",detail:"1ª corda · casa 5"},{midi:71,label:"B4",detail:"1ª corda · casa 7"},{midi:69,label:"A4",detail:"1ª corda · casa 5"},{midi:67,label:"G4",detail:"1ª corda · casa 3"},{midi:64,label:"E4",detail:"1ª corda · casa 0 · solta"}]}
+};
+let selectedPractice="open",practiceIndex=0,practiceStream=null,practiceContext=null,practiceAnalyser=null,practiceFrame=null,practiceArmed=true,practiceStableMidi=null,practiceStableFrames=0,practiceSilenceFrames=0;
+const practiceSelect=$("#practiceSelect"),practiceNotes=["C","C♯","D","D♯","E","F","F♯","G","G♯","A","A♯","B"];
+function renderPractice(){
+ const lesson=practiceLessons[selectedPractice],target=lesson.targets[Math.min(practiceIndex,lesson.targets.length-1)];
+ $("#practiceLessonLabel").textContent=lesson.label;$("#practiceLessonTitle").textContent=lesson.title;$("#practiceLessonGoal").textContent=lesson.goal;$("#practiceInstruction").textContent=lesson.instruction;$("#practiceExpected").textContent=target.label;$("#practiceExpectedDetail").textContent=target.detail;
+ const sequence=$("#practiceSequence");sequence.innerHTML="";
+ lesson.targets.forEach((item,index)=>{const chip=document.createElement("span");chip.className="practice-chip"+(index<practiceIndex?" done":index===practiceIndex?" current":"");chip.textContent=(index+1)+". "+item.label;sequence.appendChild(chip);});
+ const percent=Math.round(practiceIndex/lesson.targets.length*100);$("#practiceProgressText").textContent=practiceIndex+" de "+lesson.targets.length+" notas";$("#practiceProgressPercent").textContent=percent+"%";$("#practiceProgressBar").style.width=percent+"%";
+ $("#practiceState").textContent=practiceStream?"ESCUTANDO":practiceIndex===lesson.targets.length?"CONCLUÍDA":"AGUARDANDO";
+}
+function resetPractice(){practiceIndex=0;renderPractice();$("#practiceHeard").textContent="—";$("#practiceFrequency").textContent="Aguardando o primeiro toque";$("#practiceFeedback").textContent="Toque uma nota por vez. O sistema vai comparar a altura musical com a nota solicitada.";}
+async function stopPractice(updateMessage=true){
+ if(practiceFrame)cancelAnimationFrame(practiceFrame);practiceFrame=null;if(practiceStream)practiceStream.getTracks().forEach(track=>track.stop());practiceStream=null;
+ if(practiceContext&&practiceContext.state!=="closed")await practiceContext.close();practiceContext=null;practiceAnalyser=null;
+ $("#practiceStart").disabled=false;$("#practiceStop").disabled=true;$("#practiceState").textContent=practiceIndex===practiceLessons[selectedPractice].targets.length?"CONCLUÍDA":"PAUSADA";if(updateMessage)$("#practiceStatus").textContent="Microfone desativado.";
+}
+function practiceResult(midi,cents,hz){
+ const lesson=practiceLessons[selectedPractice],target=lesson.targets[practiceIndex];if(!target)return;const heard=practiceNotes[(midi%12+12)%12]+(Math.floor(midi/12)-1);
+ $("#practiceHeard").textContent=heard;$("#practiceFrequency").textContent=hz.toFixed(1)+" Hz · "+(cents>0?"+":"")+cents.toFixed(0)+" cents";
+ if(midi===target.midi&&Math.abs(cents)<=45){
+  practiceIndex++;renderPractice();$("#practiceFeedback").textContent="Nota correta! Abafe a corda e toque a próxima quando estiver pronto.";
+  if(practiceIndex>=lesson.targets.length){$("#practiceFeedback").textContent="Excelente! Você concluiu esta lição com todas as notas reconhecidas.";$("</>");$("#practiceStatus").textContent="Lição concluída. Escolha outra atividade para continuar praticando.";stopPractice(false);}
+  else $("#practiceExpected").textContent=lesson.targets[practiceIndex].label;
+ }else if(midi===target.midi)$("#practiceFeedback").textContent="A nota está correta, mas parece desafinada ("+(cents>0?"acima":"abaixo")+" do tom). Afine o instrumento e tente novamente.";
+ else $("#practiceFeedback").textContent="Ainda não. O microfone ouviu "+heard+", mas a nota esperada é "+target.label+". Confira a corda e a casa indicadas.";
+}
+function practiceListen(){
+ if(!practiceAnalyser||!practiceContext)return;const buffer=new Float32Array(practiceAnalyser.fftSize);practiceAnalyser.getFloatTimeDomainData(buffer);const hz=estimate(buffer,practiceContext.sampleRate);
+ if(hz){const midiFloat=69+12*Math.log2(hz/440),midi=Math.round(midiFloat),cents=(midiFloat-midi)*100;practiceSilenceFrames=0;if(practiceStableMidi===midi)practiceStableFrames++;else{practiceStableMidi=midi;practiceStableFrames=1;}if(practiceStableFrames>=3&&practiceArmed){practiceArmed=false;practiceResult(midi,cents,hz);}}
+ else{practiceSilenceFrames++;practiceStableFrames=0;practiceStableMidi=null;if(practiceSilenceFrames>=5)practiceArmed=true;}
+ practiceFrame=requestAnimationFrame(practiceListen);
+}
+practiceSelect.addEventListener("change",async()=>{await stopPractice(false);selectedPractice=practiceSelect.value;resetPractice();$("#practiceStatus").textContent="Lição selecionada. Ative o microfone quando estiver pronto.";});
+$("#practiceStart").addEventListener("click",async()=>{
+ if(practiceStream)return;if(practiceIndex>=practiceLessons[selectedPractice].targets.length)resetPractice();
+ try{if(!navigator.mediaDevices?.getUserMedia)throw Error("O acesso ao microfone exige HTTPS e um navegador compatível.");const Ctx=window.AudioContext||window.webkitAudioContext;if(!Ctx)throw Error("Este navegador não oferece análise de áudio compatível.");
+ practiceStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});practiceContext=new Ctx();await practiceContext.resume();
+ const source=practiceContext.createMediaStreamSource(practiceStream);practiceAnalyser=practiceContext.createAnalyser();practiceAnalyser.fftSize=8192;practiceAnalyser.smoothingTimeConstant=0;source.connect(practiceAnalyser);
+ practiceArmed=true;practiceStableMidi=null;practiceStableFrames=0;practiceSilenceFrames=0;$("#practiceStart").disabled=true;$("#practiceStop").disabled=false;$("#practiceStatus").textContent="Microfone ativo. Toque somente a nota indicada e abafe-a entre tentativas.";
+ $("#practiceState").textContent="ESCUTANDO";practiceFrame=requestAnimationFrame(practiceListen);
+ }catch(error){await stopPractice(false);$("#practiceStatus").textContent=error.name==="NotAllowedError"?"Permissão do microfone negada. Autorize o acesso nas configurações do navegador.":error.message;}
+});
+$("#practiceStop").addEventListener("click",()=>stopPractice(true));
+
+window.addEventListener("pagehide",()=>{stopMetro();if(stream)stream.getTracks().forEach(t=>t.stop());if(practiceStream)practiceStream.getTracks().forEach(t=>t.stop());});
 const today=new Date(),dayStamp=[today.getFullYear(),String(today.getMonth()+1).padStart(2,"0"),String(today.getDate()).padStart(2,"0")].join("-");const storageKey="guitarlab-routine-v1-"+dayStamp,checks=$(".tasks input");
 function updateProgress(){const done=checks.filter(c=>c.checked).length,p=Math.round(done/checks.length*100);$("#progressText").textContent=done+" de "+checks.length+" concluídas";$("#progressPercent").textContent=p+"%";$("#progressBar").style.width=p+"%";try{localStorage.setItem(storageKey,JSON.stringify(checks.filter(c=>c.checked).map(c=>c.dataset.task)));}catch(e){}}
 try{const saved=JSON.parse(localStorage.getItem(storageKey)||"[]");checks.forEach(c=>c.checked=saved.includes(c.dataset.task));}catch(e){}
-checks.forEach(c=>c.addEventListener("change",updateProgress));$("#resetTasks").addEventListener("click",()=>{checks.forEach(c=>c.checked=false);updateProgress();});updateProgress();$("#year").textContent=new Date().getFullYear();
+checks.forEach(c=>c.addEventListener("change",updateProgress));$("#resetTasks").addEventListener("click",()=>{checks.forEach(c=>c.checked=false);updateProgress();});updateProgress();practiceSelect.value=selectedPractice;resetPractice();$("#year").textContent=new Date().getFullYear();
 })();

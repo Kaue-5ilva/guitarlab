@@ -6,12 +6,12 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%234da3ff'/%3E%3Ctext x='14' y='46' font-size='43' fill='%23080c14'%3E♪%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./styles.css?v=blue-20261102"><script src="./app.js?v=blue-20261102" defer></script></head>
+<link rel="stylesheet" href="./styles.css?v=practice-20261102"><script src="./app.js?v=practice-20261102" defer></script></head>
 <body>
 <div class="topline"><i></i> GUITARRA ELÉTRICA E VIOLÃO · 6 CORDAS <b>•</b> 100% ONLINE</div>
 <header class="header"><a class="logo" href="#inicio"><span class="logo-icon">♪</span><span>GUITAR<span>LAB</span><small>PLAY. LEARN. REPEAT.</small></span></a>
 <button class="menu-button" id="menuButton" aria-label="Abrir menu" aria-expanded="false">☰</button>
-<nav id="navigation"><a href="#instrumentos">Instrumentos</a><a href="#trilhas">Trilhas</a><a href="#laboratorio">Laboratório</a><a href="#rotina">Minha rotina</a><a class="nav-cta" href="#laboratorio">Começar a praticar <b>↗</b></a></nav></header>
+<nav id="navigation"><a href="#instrumentos">Instrumentos</a><a href="#trilhas">Trilhas</a><a href="#aulas">Aulas práticas</a><a href="#laboratorio">Laboratório</a><a href="#rotina">Minha rotina</a><a class="nav-cta" href="#aulas">Começar a praticar <b>↗</b></a></nav></header>
 <main>
 <section class="hero wrap" id="inicio"><div class="hero-copy"><p class="eyebrow"><i></i> APRENDA NO SEU TEMPO</p><h1>Aprenda<br>guitarra e<br><em>violão.</em></h1>
 <p class="hero-text">Um espaço para aprender guitarra elétrica e violão de seis cordas, do primeiro contato com o instrumento aos acordes, ritmos, escalas e músicas completas.</p>
@@ -34,7 +34,27 @@
 <div class="paths"><article class="path-card featured"><div class="path-top"><span>01</span><b>COMECE AQUI</b></div><div class="path-art">♩</div><small>NÍVEL 01 · INICIANTE</small><h3>Fundamentos das 6 cordas</h3><p>Aprenda as partes do instrumento, a afinação E–A–D–G–B–E, a postura, a numeração das cordas e os primeiros acordes.</p><a href="#rotina">Ver conteúdo <b>↗</b></a></article>
 <article class="path-card"><div class="path-top"><span>02</span><b>FUNDAMENTAL</b></div><div class="path-art orange">〰</div><small>NÍVEL 02 · BÁSICO</small><h3>Acordes e ritmo</h3><p>Pratique acordes abertos, mudanças limpas, batidas no violão e palhetada na guitarra.</p><a href="#rotina">Ver conteúdo <b>↗</b></a></article>
 <article class="path-card"><div class="path-top"><span>03</span><b>EVOLUÇÃO</b></div><div class="path-art purple">✳</div><small>NÍVEL 03 · INTERMEDIÁRIO</small><h3>Escalas e sonoridade</h3><p>Estude notas no braço, escala maior, pentatônica, riffs, dedilhados e expressão musical.</p><a href="#rotina">Ver conteúdo <b>↗</b></a></article></div></section>
-<section class="lab" id="laboratorio"><div class="wrap"><div class="section-head"><div><p class="eyebrow">03 / FERRAMENTAS INTERATIVAS</p><h2>Seu laboratório<br>de <em>prática.</em></h2></div><p>Use as ferramentas com guitarra ou violão de seis cordas. Para o afinador, selecione a afinação padrão e toque uma corda por vez.</p></div>
+<section class="section wrap practice-section" id="aulas">
+<div class="section-head"><div><p class="eyebrow">03 / TREINE COM SEU INSTRUMENTO</p><h2>Aulas práticas.<br><em>Som de verdade.</em></h2></div><p>Toque sua guitarra elétrica ou seu violão perto do microfone. O GuitarLab escuta as notas, compara com o exercício e mostra quando você acertar.</p></div>
+<div class="practice-shell">
+<div class="practice-main">
+<div class="practice-selector"><label for="practiceSelect">ESCOLHA UMA LIÇÃO</label><select id="practiceSelect"><option value="open">01 · Cordas soltas</option><option value="chromatic">02 · Cromatismo na primeira corda</option><option value="melody">03 · Pequena sequência melódica</option></select></div>
+<div class="practice-lesson-head"><small id="practiceLessonLabel">LIÇÃO 01 · AFINAÇÃO PADRÃO</small><h3 id="practiceLessonTitle">Conhecendo as cordas soltas</h3><p id="practiceLessonGoal">Toque cada uma das seis cordas soltas, da mais grave à mais aguda.</p></div>
+<div class="practice-instruction"><span>COMO FAZER</span><p id="practiceInstruction">Toque apenas a corda indicada. Deixe a nota soar e depois abafe a corda antes de tocar a próxima.</p></div>
+<div class="practice-sequence" id="practiceSequence" aria-label="Sequência de notas do exercício"></div>
+<div class="practice-actions"><button class="button primary" id="practiceStart">⌁ ATIVAR MICROFONE E COMEÇAR</button><button class="button practice-stop" id="practiceStop" disabled>PARAR</button></div>
+<p class="practice-status" id="practiceStatus" role="status" aria-live="polite">O exercício está pronto. Permita o acesso ao microfone para começar.</p>
+</div>
+<aside class="practice-monitor">
+<div class="practice-monitor-top"><small>LEITURA EM TEMPO REAL</small><span id="practiceState">AGUARDANDO</span></div>
+<div class="practice-note-block"><small>NOTA ESPERADA</small><strong id="practiceExpected">E2</strong><span id="practiceExpectedDetail">6ª corda · Mi grave (solta)</span></div>
+<div class="practice-divider"></div>
+<div class="practice-note-block heard"><small>O MICROFONE OUVIU</small><strong id="practiceHeard">—</strong><span id="practiceFrequency">Aguardando o primeiro toque</span></div>
+<div class="practice-progress"><div><span id="practiceProgressText">0 de 6 notas</span><b id="practiceProgressPercent">0%</b></div><div class="practice-progress-track"><i id="practiceProgressBar"></i></div></div>
+<div class="practice-feedback" id="practiceFeedback">Toque uma nota por vez. O sistema vai comparar a altura musical com a nota solicitada.</div>
+<p class="practice-disclaimer">Use um ambiente relativamente silencioso. Na guitarra elétrica, deixe o amplificador audível no ambiente. O microfone não analisa acordes completos nesta versão; os exercícios verificam notas individuais.</p>
+</aside>
+</div></section><section class="lab" id="laboratorio"><div class="wrap"><div class="section-head"><div><p class="eyebrow">03 / FERRAMENTAS INTERATIVAS</p><h2>Seu laboratório<br>de <em>prática.</em></h2></div><p>Use as ferramentas com guitarra ou violão de seis cordas. Para o afinador, selecione a afinação padrão e toque uma corda por vez.</p></div>
 <div class="lab-layout"><div class="tool-menu" role="tablist" aria-label="Ferramentas"><button class="tool-tab active" data-tool="chords" role="tab" aria-selected="true"><span>♬</span><b>Acordes</b><small>Biblioteca visual</small></button><button class="tool-tab" data-tool="metro" role="tab" aria-selected="false"><span>◷</span><b>Metrônomo</b><small>Ritmo e precisão</small></button><button class="tool-tab" data-tool="tuner" role="tab" aria-selected="false"><span>⌁</span><b>Afinador</b><small>Afinação padrão</small></button><div class="tool-tip">✦ <p><b>Dica de prática</b><br>Comece devagar. A precisão vem antes da velocidade.</p></div></div>
 <div class="tool-content">
 <section class="tool-panel active" id="panel-chords" role="tabpanel"><div class="panel-head"><div><small>ACORDES PARA 6 CORDAS</small><h3>Encontre sua posição.</h3></div><span>INTERATIVO</span></div><div class="chord-controls"><label for="chordSelect">ESCOLHA UM ACORDE</label><select id="chordSelect"><option value="Em">Em · Mi menor</option><option value="G">G · Sol maior</option><option value="C">C · Dó maior</option><option value="D">D · Ré maior</option><option value="Am">Am · Lá menor</option><option value="E">E · Mi maior</option><option value="A">A · Lá maior</option><option value="Dm">Dm · Ré menor</option><option value="A7">A7 · Lá com sétima</option><option value="D7">D7 · Ré com sétima</option><option value="E7">E7 · Mi com sétima</option><option value="G7">G7 · Sol com sétima</option><option value="Cmaj7">Cmaj7 · Dó com sétima maior</option><option value="B7">B7 · Si com sétima</option></select><div class="chord-name"><b id="chordTitle">Em</b><span id="chordSubtitle">Mi menor</span></div></div><div class="chord-area"><div id="chordDiagram" class="chord-diagram"></div><div class="chord-info"><small>COMO TOCAR</small><p id="chordDescription"></p><ul><li><b>×</b> Não toque a corda</li><li><b>○</b> Corda solta</li><li><b>●</b> Posição do dedo</li></ul><small class="muted">Guitarra e violão · afinação padrão E–A–D–G–B–E. O diagrama mostra a 6ª corda à esquerda e a 1ª à direita.</small></div></div></section>

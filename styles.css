@@ -18,3 +18,27 @@
 .string-chips>span small{font:7px var(--mono);color:#8ec5ff;margin-bottom:3px}
 a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #8ec5ff;outline-offset:3px}
 @media(max-width:620px){.instrument-grid{grid-template-columns:1fr}.instrument-card{min-height:220px;padding:21px}.tuning-strip{align-items:flex-start;flex-direction:column}.string-chips{width:100%;gap:5px}.string-chips>span{flex:1;width:auto;height:41px}.instrument-card p{min-height:0}}
+
+/* Aulas práticas com avaliação pelo microfone */
+.practice-section{padding-top:96px;padding-bottom:104px}.practice-shell{display:grid;grid-template-columns:1.12fr .88fr;gap:14px}
+.practice-main,.practice-monitor{background:var(--panel);border:1px solid var(--line);padding:26px}
+.practice-selector label,.practice-lesson-head small,.practice-instruction>span,.practice-monitor-top small,.practice-note-block small{font:8px var(--mono);letter-spacing:.12em;color:var(--lime)}
+.practice-selector select{display:block;width:100%;margin-top:8px;padding:11px 12px;border:1px solid #31445e;border-radius:3px;background:#182338;color:var(--text);font-size:11px}
+.practice-lesson-head{padding:23px 0 16px}.practice-lesson-head h3{font:600 26px var(--display);letter-spacing:-.05em;margin:8px 0}
+.practice-lesson-head p,.practice-instruction p{font-size:11px;line-height:1.8;color:#b5c3d6;margin:0}
+.practice-instruction{border-top:1px solid var(--line);padding:16px 0}.practice-instruction p{margin-top:7px}
+.practice-sequence{display:flex;flex-wrap:wrap;gap:7px;padding:8px 0 20px}.practice-chip{border:1px solid #31445e;background:#0e1522;border-radius:3px;padding:8px 10px;color:#91a4bc;font:10px var(--mono)}
+.practice-chip.current{border-color:var(--lime);background:#152943;color:var(--lime)}.practice-chip.done{border-color:#31577e;background:#182943;color:#d2e7ff}
+.practice-actions{display:flex;gap:8px;flex-wrap:wrap}.practice-actions .button{min-height:43px}.practice-stop{background:#182338;border:1px solid #31445e;color:#d2dceb}
+.practice-actions button:disabled{opacity:.45;cursor:not-allowed;transform:none}.practice-status{min-height:32px;margin:14px 0 0;color:#91a4bc;font-size:10px;line-height:1.7}
+.practice-monitor{background:linear-gradient(155deg,#14243a,#101827 65%);display:flex;flex-direction:column}
+.practice-monitor-top{display:flex;justify-content:space-between;gap:10px;align-items:center;border-bottom:1px solid var(--line);padding-bottom:15px}
+.practice-monitor-top span{font:8px var(--mono);color:#b5c3d6;border:1px solid #31445e;padding:6px 8px}
+.practice-note-block{display:flex;flex-direction:column;gap:5px;padding:20px 0 16px}.practice-note-block strong{font:600 54px/.98 var(--display);letter-spacing:-.07em;color:var(--lime)}
+.practice-note-block span{font-size:10px;color:#b5c3d6}.practice-note-block.heard strong{color:#f4f7fc}.practice-divider{border-top:1px solid var(--line)}
+.practice-progress{margin-top:4px}.practice-progress>div:first-child{display:flex;justify-content:space-between;color:#a5b3c7;font:9px var(--mono);margin-bottom:8px}.practice-progress b{color:var(--lime)}
+.practice-progress-track{height:5px;background:#26364b;border-radius:10px;overflow:hidden}.practice-progress-track i{display:block;width:0;height:100%;background:var(--lime);transition:width .2s}
+.practice-feedback{min-height:58px;margin-top:16px;padding:12px;background:#0e1522;border-left:2px solid var(--lime);color:#d2dceb;font-size:10px;line-height:1.7}
+.practice-disclaimer{margin:14px 0 0;color:#91a4bc;font-size:9px;line-height:1.75}
+@media(max-width:800px){.practice-shell{grid-template-columns:1fr}.practice-monitor{display:grid;grid-template-columns:1fr 1fr;column-gap:18px}.practice-monitor-top,.practice-progress,.practice-feedback,.practice-disclaimer{grid-column:1/-1}.practice-note-block strong{font-size:46px}}
+@media(max-width:620px){.practice-section{padding-top:72px;padding-bottom:75px}.practice-main,.practice-monitor{padding:18px 14px}.practice-lesson-head h3{font-size:22px}.practice-actions .button{width:100%}.practice-monitor{display:flex}.practice-note-block strong{font-size:50px}}
