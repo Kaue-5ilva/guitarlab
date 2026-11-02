@@ -100,9 +100,14 @@ function practiceResult(midi,cents,hz){
  const lesson=practiceLessons[selectedPractice],target=lesson.targets[practiceIndex];if(!target)return;const heard=practiceNotes[(midi%12+12)%12]+(Math.floor(midi/12)-1);
  $("#practiceHeard").textContent=heard;$("#practiceFrequency").textContent=hz.toFixed(1)+" Hz · "+(cents>0?"+":"")+cents.toFixed(0)+" cents";
  if(midi===target.midi&&Math.abs(cents)<=45){
-  practiceIndex++;renderPractice();$("#practiceFeedback").textContent="Nota correta! Abafe a corda e toque a próxima quando estiver pronto.";
-  if(practiceIndex>=lesson.targets.length){$("#practiceFeedback").textContent="Excelente! Você concluiu esta lição com todas as notas reconhecidas.";$("#practiceStatus").textContent="Lição concluída. Escolha outra atividade para continuar praticando.";stopPractice(false);}
-  else $("#practiceExpected").textContent=lesson.targets[practiceIndex].label;
+  practiceIndex++;practiceCorrect++;renderPractice();$("#practiceFeedback").textContent="Nota reconhecida! Abafe a corda e siga para a próxima.";
+  if(practiceIndex>=lesson.targets.length){
+   const accuracy=Math.round((practiceCorrect/lesson.targets.length)*100),alreadyDone=learningProgress.completed.includes(selectedPractice);
+   if(!alreadyDone){learningProgress.completed.push(selectedPractice);learningProgress.xp+=50;}
+   learningProgress.lastAccuracy=accuracy;saveLearningProgress();renderLearningProgress();
+   $("#practiceFeedback").textContent="LIÇÃO CONCLUÍDA! "+accuracy+"% de precisão. "+(alreadyDone?"Etapa concluída novamente.":"Você ganhou 50 XP e avançou no seu caminho.");
+   $("#practiceStatus").textContent="Etapa concluída. Escolha a próxima lição no caminho de aprendizado.";stopPractice(false);
+  }else $("#practiceExpected").textContent=lesson.targets[practiceIndex].label;
  }else if(midi===target.midi)$("#practiceFeedback").textContent="A nota está correta, mas parece desafinada ("+(cents>0?"acima":"abaixo")+" do tom). Afine o instrumento e tente novamente.";
  else $("#practiceFeedback").textContent="Ainda não. O microfone ouviu "+heard+", mas a nota esperada é "+target.label+". Confira a corda e a casa indicadas.";
 }
@@ -130,5 +135,5 @@ window.addEventListener("pagehide",()=>{stopMetro();if(stream)stream.getTracks()
 const today=new Date(),dayStamp=[today.getFullYear(),String(today.getMonth()+1).padStart(2,"0"),String(today.getDate()).padStart(2,"0")].join("-");const storageKey="guitarlab-routine-v1-"+dayStamp,checks=$(".tasks input");
 function updateProgress(){const done=checks.filter(c=>c.checked).length,p=Math.round(done/checks.length*100);$("#progressText").textContent=done+" de "+checks.length+" concluídas";$("#progressPercent").textContent=p+"%";$("#progressBar").style.width=p+"%";try{localStorage.setItem(storageKey,JSON.stringify(checks.filter(c=>c.checked).map(c=>c.dataset.task)));}catch(e){}}
 try{const saved=JSON.parse(localStorage.getItem(storageKey)||"[]");checks.forEach(c=>c.checked=saved.includes(c.dataset.task));}catch(e){}
-checks.forEach(c=>c.addEventListener("change",updateProgress));$("#resetTasks").addEventListener("click",()=>{checks.forEach(c=>c.checked=false);updateProgress();});updateProgress();practiceSelect.value=selectedPractice;resetPractice();$("#year").textContent=new Date().getFullYear();
+checks.forEach(c=>c.addEventListener("change",updateProgress));$("#resetTasks").addEventListener("click",()=>{checks.forEach(c=>c.checked=false);updateProgress();});updateProgress();practiceSelect.value=selectedPractice;renderLearningProgress();resetPractice();$("#year").textContent=new Date().getFullYear();
 })();
